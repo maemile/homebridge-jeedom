@@ -1,20 +1,27 @@
 {
-  "name": "homebridge-cmdswitch2",
-  "version": "0.2.10",
-  "description": "CMD plugin for HomeBridge (API 2.0): https://github.com/nfarina/homebridge",
+  "name": "homebridge-jeedom",
+  "version": "1.0.0",
+  "description": "Jeedom plugin for Homebridge",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
-    "url": "git://github.com/luisiam/homebridge-cmdswitch2.git"
+    "url": "git+https://github.com/dorian-eydoux/homebridge-jeedom.git"
   },
   "keywords": [
     "homebridge-plugin"
   ],
-  "author": "Luis Iam",
-  "license": "ISC",
+  "author": "Dorian Eydoux",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/luisiam/homebridge-cmdswitch2/issues"
+    "url": "https://github.com/dorian-eydoux/homebridge-jeedom/issues"
   },
-  "homepage": "https://github.com/luisiam/homebridge-cmdswitch2#readme",
+  "homepage": "https://github.com/dorian-eydoux/homebridge-jeedom#readme",
+  "dependencies": {
+    "got": "^10.6.0"
+  },
   "engines": {
     "node": ">=0.12.0",
     "homebridge": ">=0.3.0"
