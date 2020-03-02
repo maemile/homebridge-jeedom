@@ -16,10 +16,10 @@ jobs:
       run: |
         npm install
         npm run test
-    - name: Publishing on NPM
+    - name: Publishing
       run: |
         npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
-        npm publish
+        npm run publish
       env:
         CI: true
         NPM_TOKEN: ${{ secrets.npm_token }}

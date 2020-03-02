@@ -1,10 +1,11 @@
 {
   "name": "homebridge-jeedom",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Jeedom plugin for Homebridge",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "publish": "node publish.js"
   },
   "repository": {
     "type": "git",
