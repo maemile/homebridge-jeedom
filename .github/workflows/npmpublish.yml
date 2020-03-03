@@ -12,14 +12,14 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install dependencies and test it
-      run: |
-        npm install
-        npm run test
+    - name: Installing dependencies
+      run: npm i
+    - name: Testing
+      run: node .github/test.js
     - name: Publishing
       run: |
         npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
-        npm run publish
+        node .github/publish.js
       env:
         CI: true
         NPM_TOKEN: ${{ secrets.npm_token }}

@@ -1,18 +1,16 @@
 {
   "name": "homebridge-jeedom",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Jeedom plugin for Homebridge",
   "main": "index.js",
-  "scripts": {
-    "test": "node test.js",
-    "publish": "node publish.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dorian-eydoux/homebridge-jeedom.git"
   },
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "homekit",
+    "jeedom"
   ],
   "author": "Dorian Eydoux",
   "license": "MIT",

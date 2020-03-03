@@ -127,12 +127,13 @@ jeedomPlatform.prototype.setService = function (accessory) {
 
 // Method to retrieve initial state
 jeedomPlatform.prototype.getInitState = function (accessory) {
-    var manufacturer = accessory.context.manufacturer || "Default-Manufacturer";
-    var model = accessory.context.model || "Default-Model";
-    var serial = accessory.context.serial || "Default-SerialNumber";
+    let manufacturer = accessory.context.manufacturer || "Dorian Eydoux";
+    let model = accessory.context.model || "homebridge-jeedom";
+    let serial = accessory.context.serial || "Default-SerialNumber";
 
     // Update HomeKit accessory information
     accessory.getService(Service.AccessoryInformation)
+        .setCharacteristic(Characteristic.FirmwareRevision, require("./package.json").version)
         .setCharacteristic(Characteristic.Manufacturer, manufacturer)
         .setCharacteristic(Characteristic.Model, model)
         .setCharacteristic(Characteristic.SerialNumber, serial);

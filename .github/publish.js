@@ -1,4 +1,4 @@
-const localPackage = require("./package.json"),
+const localPackage = require("../package.json"),
     exec = require("child_process").exec;
 exec(`npm info ${localPackage.name} version`, (error, stdout, stderr) => {
     if (error) console.error(error);
