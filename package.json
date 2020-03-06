@@ -18,9 +18,6 @@
     "url": "https://github.com/dorian-eydoux/homebridge-jeedom/issues"
   },
   "homepage": "https://github.com/dorian-eydoux/homebridge-jeedom#readme",
-  "dependencies": {
-    "got": "^10.6.0"
-  },
   "engines": {
     "node": ">=0.12.0",
     "homebridge": ">=0.3.0"

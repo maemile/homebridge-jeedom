@@ -1,5 +1,5 @@
-const got = require('got');
-let Accessory, Service, Characteristic, UUIDGen;
+const got = require("got");
+let Accessory, Service, Characteristic, UUIDGen, protocolModule;
 
 module.exports = function (homebridge) {
     Accessory = homebridge.platformAccessory;
@@ -25,6 +25,8 @@ function jeedomPlatform(log, config, api) {
         this.api = api;
         this.api.on('didFinishLaunching', this.didFinishLaunching.bind(this));
     };
+
+    protocolModule = require(this.config.url.split(":")[0]);
 };
 
 // Method to restore accessories from cache
@@ -158,25 +160,23 @@ jeedomPlatform.prototype.getState = function (thisSwitch, callback) {
     };
 
     // Request to Jeedom server to detect state
-    got(this.formated_url + thisSwitch.state_cmd)
-        .then(response => {
-            let error, body = parseInt(response.body, 10);
+    protocolModule.get(this.formated_url + thisSwitch.state_cmd, (response) => response.on("data", (chunk) => response.on("end", () => {
+        let error, body = parseInt(JSON.parse(chunk), 10);
 
-            if (isNaN(body)) {
-                error = "The returned value by Jeedom server isn't a number";
+        if (isNaN(body)) {
+            error = "The returned value by Jeedom server isn't a number";
 
-                this.log(`Failed to determine ${thisSwitch.name} state.`);
-                this.log(error);
-            };
-
-            callback(error, body === 1 ? true : false);
-        })
-        .catch(error => {
             this.log(`Failed to determine ${thisSwitch.name} state.`);
             this.log(error);
+        };
 
-            callback(error, state);
-        });
+        callback(error, Boolean(body));
+    }))).on("error", (error) => {
+        this.log(`Failed to determine ${thisSwitch.name} state.`);
+        this.log(error.message);
+
+        callback(error);
+    });
 };
 
 // Method to determine current state
@@ -226,36 +226,26 @@ jeedomPlatform.prototype.setPowerState = function (thisSwitch, state, callback) 
     let timer;
 
     // Request to Jeedom server to set state
-    got(this.formated_url + cmd)
-        .then(response => {
-            if (cmd) this.log(`${thisSwitch.name} is turned ${state ? "on" : "off"}.`);
+    protocolModule.get(this.formated_url + cmd, () => {
+        if (cmd) this.log(`${thisSwitch.name} is turned ${state ? "on" : "off"}.`);
 
-            thisSwitch.state = state;
+        thisSwitch.state = state;
 
-            // Restore state after 1s if only one command exists
-            if (!(state ? thisSwitch.off_cmd : thisSwitch.on_cmd) && !thisSwitch.state_cmd) {
-                setTimeout(function () {
-                    this.accessories[thisSwitch.name].getService(Service.Switch)
-                        .setCharacteristic(Characteristic.On, !state);
-                }, 1000);
-            };
+        if (timer) {
+            clearTimeout(timer);
+            callback(null);
+        };
+    }).on("error", (error) => {
+        if (state !== thisSwitch.state) this.log(`Failed to turn ${state ? "on" : "off"} ${thisSwitch.name}.`);
+        this.log(error);
 
-            if (timer) {
-                clearTimeout(timer);
-                callback(null);
-            };
-        })
-        .catch(error => {
-            if (state !== thisSwitch.state) this.log(`Failed to turn ${state ? "on" : "off"} ${thisSwitch.name}.`);
-            this.log(error);
-
-            callback(error);
-        });
+        callback(error);
+    });
 
     // Allow 1s to set state but otherwise assumes success
-    timer = setTimeout(function () {
+    timer = setTimeout(() => {
         timer = null;
-        this.log(`Turning " + ${state ? "on " : "off "} ${thisSwitch.name} took too long [${thisSwitch.timeout}s], assuming success.`);
+        this.log(`Turning ${state ? "on" : "off"} ${thisSwitch.name} took too long [${thisSwitch.timeout}s], assuming success.`);
         callback();
     }, thisSwitch.timeout * 1000);
 };
