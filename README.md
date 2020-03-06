@@ -1,4 +1,6 @@
-# homebridge-jeedom [![npm version](https://badge.fury.io/js/homebridge-jeedom.svg)](https://badge.fury.io/js/homebridge-jeedom)
+# homebridge-jeedom
+[![npm](https://img.shields.io/npm/v/homebridge-jeedom?style=for-the-badge)![npm](https://img.shields.io/npm/dt/homebridge-jeedom?style=for-the-badge)](https://npmjs.com/homebridge-jeedom)
+
 [Jeedom](https://jeedom.com) plugin for [Homebridge](https://github.com/nfarina/homebridge)
 
 ### What this plugin does
