@@ -1,4 +1,3 @@
-const got = require("got");
 let Accessory, Service, Characteristic, UUIDGen, protocolModule;
 
 module.exports = function (homebridge) {
