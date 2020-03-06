@@ -22,7 +22,7 @@ function jeedomPlatform(log, config, api) {
 
     if (api) {
         this.api = api;
-        this.api.on('didFinishLaunching', this.didFinishLaunching.bind(this));
+        this.api.on("didFinishLaunching", this.didFinishLaunching.bind(this));
     };
 
     protocolModule = require(this.config.url.split(":")[0]);
@@ -48,7 +48,7 @@ jeedomPlatform.prototype.didFinishLaunching = function () {
 
 // Method to add and update HomeKit accessories
 jeedomPlatform.prototype.addAccessory = function (data) {
-    this.log("Initializing platform accessory '" + data.name + "'...");
+    this.log(`Initializing platform accessory ${data.name}...`);
 
     // Retrieve accessory from cache
     var accessory = this.accessories[data.name];
@@ -110,7 +110,7 @@ jeedomPlatform.prototype.addAccessory = function (data) {
 jeedomPlatform.prototype.removeAccessory = function (accessory) {
     if (accessory) {
         var name = accessory.context.name;
-        this.log(name + " is removed from Homebridge.");
+        this.log(`${name} is removed from Homebridge.`);
         this.api.unregisterPlatformAccessories("homebridge-jeedom", "jeedom", [accessory]);
         delete this.accessories[name];
     };
@@ -120,10 +120,10 @@ jeedomPlatform.prototype.removeAccessory = function (accessory) {
 jeedomPlatform.prototype.setService = function (accessory) {
     accessory.getService(Service.Switch)
         .getCharacteristic(Characteristic.On)
-        .on('get', this.getPowerState.bind(this, accessory.context))
-        .on('set', this.setPowerState.bind(this, accessory.context));
+        .on("get", this.getPowerState.bind(this, accessory.context))
+        .on("set", this.setPowerState.bind(this, accessory.context));
 
-    accessory.on('identify', this.identify.bind(this, accessory.context));
+    accessory.on("identify", this.identify.bind(this, accessory.context));
 };
 
 // Method to retrieve initial state
@@ -206,14 +206,14 @@ jeedomPlatform.prototype.getPowerState = function (thisSwitch, callback) {
 
     if (thisSwitch.polling) {
         // Get state directly from cache if polling is enabled
-        this.log(thisSwitch.name + " is " + (thisSwitch.state ? "on." : "off."));
+        this.log(`${thisSwitch.name} is ${thisSwitch.state ? "on" : "off"}.`);
         callback(null, thisSwitch.state);
     } else {
         // Check state if polling is disabled
         this.getState(thisSwitch, function (error, state) {
             // Update state if command exists
             if (thisSwitch.state_cmd) thisSwitch.state = state;
-            if (!error) self.log(thisSwitch.name + " is " + (thisSwitch.state ? "on." : "off."));
+            if (!error) self.log(`${thisSwitch.name} is ${thisSwitch.state ? "on" : "off"}.`);
             callback(error, thisSwitch.state);
         });
     };
@@ -361,15 +361,15 @@ jeedomPlatform.prototype.configurationRequestHandler = function (context, reques
                         "items": [{
                                 "id": "on_cmd",
                                 "title": "CMD to Turn On",
-                                "placeholder": context.operation ? "Leave blank if unchanged" : "wakeonlan XX:XX:XX:XX:XX:XX"
+                                "placeholder": context.operation ? "Leave blank if unchanged" : "69"
                             }, {
                                 "id": "off_cmd",
                                 "title": "CMD to Turn Off",
-                                "placeholder": context.operation ? "Leave blank if unchanged" : "net rpc shutdown -I XXX.XXX.XXX.XXX -U user%password"
+                                "placeholder": context.operation ? "Leave blank if unchanged" : "68"
                             }, {
                                 "id": "state_cmd",
                                 "title": "CMD to Check ON State",
-                                "placeholder": context.operation ? "Leave blank if unchanged" : "ping -c 2 -W 1 XXX.XXX.XXX.XXX | grep -i '2 received'"
+                                "placeholder": context.operation ? "Leave blank if unchanged" : "70"
                             }, {
                                 "id": "polling",
                                 "title": "Enable Polling (true/false)",
@@ -484,16 +484,16 @@ jeedomPlatform.prototype.configurationRequestHandler = function (context, reques
                 var newSwitches = Object.keys(this.accessories).map(function (k) {
                     var accessory = self.accessories[k];
                     var data = {
-                        'name': accessory.context.name,
-                        'on_cmd': accessory.context.on_cmd,
-                        'off_cmd': accessory.context.off_cmd,
-                        'state_cmd': accessory.context.state_cmd,
-                        'polling': accessory.context.polling,
-                        'interval': accessory.context.interval,
-                        'timeout': accessory.context.timeout,
-                        'manufacturer': accessory.context.manufacturer,
-                        'model': accessory.context.model,
-                        'serial': accessory.context.serial
+                        "name": accessory.context.name,
+                        "on_cmd": accessory.context.on_cmd,
+                        "off_cmd": accessory.context.off_cmd,
+                        "state_cmd": accessory.context.state_cmd,
+                        "polling": accessory.context.polling,
+                        "interval": accessory.context.interval,
+                        "timeout": accessory.context.timeout,
+                        "manufacturer": accessory.context.manufacturer,
+                        "model": accessory.context.model,
+                        "serial": accessory.context.serial
                     };
                     return data;
                 });
