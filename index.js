@@ -37,11 +37,11 @@ jeedomPlatform.prototype.configureAccessory = function (accessory) {
 // Method to setup accesories from config.json
 jeedomPlatform.prototype.didFinishLaunching = function () {
     // Add or update accessories defined in config.json
-    for (var i in this.switches) this.addAccessory(this.switches[i]);
+    for (let i in this.switches) this.addAccessory(this.switches[i]);
 
     // Remove extra accessories in cache
-    for (var name in this.accessories) {
-        var accessory = this.accessories[name];
+    for (let name in this.accessories) {
+        const accessory = this.accessories[name];
         if (!accessory.reachable) this.removeAccessory(accessory);
     };
 };
@@ -51,12 +51,11 @@ jeedomPlatform.prototype.addAccessory = function (data) {
     this.log(`Initializing platform accessory ${data.name}...`);
 
     // Retrieve accessory from cache
-    var accessory = this.accessories[data.name];
+    let accessory = this.accessories[data.name];
 
     if (!accessory) {
         // Setup accessory as SWITCH (8) category.
-        var uuid = UUIDGen.generate(data.name);
-        accessory = new Accessory(data.name, uuid, 8);
+        accessory = new Accessory(data.name, UUIDGen.generate(data.name), 8);
 
         // Setup HomeKit switch service
         accessory.addService(Service.Switch, data.name);
@@ -83,7 +82,7 @@ jeedomPlatform.prototype.addAccessory = function (data) {
     if (data.serial) data.serial = data.serial.toString();
 
     // Store and initialize variables into context
-    var cache = accessory.context;
+    const cache = accessory.context;
     cache.name = data.name;
     cache.on_cmd = data.on_cmd;
     cache.off_cmd = data.off_cmd;
@@ -109,7 +108,7 @@ jeedomPlatform.prototype.addAccessory = function (data) {
 // Method to remove accessories from HomeKit
 jeedomPlatform.prototype.removeAccessory = function (accessory) {
     if (accessory) {
-        var name = accessory.context.name;
+        const name = accessory.context.name;
         this.log(`${name} is removed from Homebridge.`);
         this.api.unregisterPlatformAccessories("homebridge-jeedom", "jeedom", [accessory]);
         delete this.accessories[name];
@@ -128,16 +127,12 @@ jeedomPlatform.prototype.setService = function (accessory) {
 
 // Method to retrieve initial state
 jeedomPlatform.prototype.getInitState = function (accessory) {
-    let manufacturer = accessory.context.manufacturer || "Dorian Eydoux";
-    let model = accessory.context.model || "homebridge-jeedom";
-    let serial = accessory.context.serial || "Default-SerialNumber";
-
     // Update HomeKit accessory information
     accessory.getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.FirmwareRevision, require("./package.json").version)
-        .setCharacteristic(Characteristic.Manufacturer, manufacturer)
-        .setCharacteristic(Characteristic.Model, model)
-        .setCharacteristic(Characteristic.SerialNumber, serial);
+        .setCharacteristic(Characteristic.Manufacturer, accessory.context.manufacturer || "Dorian Eydoux")
+        .setCharacteristic(Characteristic.Model, accessory.context.model || "homebridge-jeedom")
+        .setCharacteristic(Characteristic.SerialNumber, accessory.context.serial || "Default-SerialNumber");
 
     // Retrieve initial state if polling is disabled
     if (!accessory.context.polling) {
@@ -159,8 +154,9 @@ jeedomPlatform.prototype.getState = function (thisSwitch, callback) {
     };
 
     // Request to Jeedom server to detect state
-    protocolModule.get(this.formated_url + thisSwitch.state_cmd, (response) => response.on("data", (chunk) => response.on("end", () => {
-        let error, body = parseInt(JSON.parse(chunk), 10);
+    protocolModule.get(this.formated_url + thisSwitch.state_cmd, (response) => response.on("data", (chunk) => {
+        const body = parseInt(JSON.parse(chunk), 10);
+        let error;
 
         if (isNaN(body)) {
             error = "The returned value by Jeedom server isn't a number";
@@ -170,7 +166,7 @@ jeedomPlatform.prototype.getState = function (thisSwitch, callback) {
         };
 
         callback(error, Boolean(body));
-    }))).on("error", (error) => {
+    })).on("error", (error) => {
         this.log(`Failed to determine ${thisSwitch.name} state.`);
         this.log(error.message);
 
@@ -180,8 +176,8 @@ jeedomPlatform.prototype.getState = function (thisSwitch, callback) {
 
 // Method to determine current state
 jeedomPlatform.prototype.statePolling = function (name) {
-    var accessory = this.accessories[name];
-    var thisSwitch = accessory.context;
+    const accessory = this.accessories[name];
+    const thisSwitch = accessory.context;
 
     // Clear polling
     clearTimeout(this.polling[name]);
@@ -202,7 +198,7 @@ jeedomPlatform.prototype.statePolling = function (name) {
 
 // Method to determine current state
 jeedomPlatform.prototype.getPowerState = function (thisSwitch, callback) {
-    var self = this;
+    const self = this;
 
     if (thisSwitch.polling) {
         // Get state directly from cache if polling is enabled
@@ -221,7 +217,8 @@ jeedomPlatform.prototype.getPowerState = function (thisSwitch, callback) {
 
 // Method to set state
 jeedomPlatform.prototype.setPowerState = function (thisSwitch, state, callback) {
-    let cmd = state ? thisSwitch.on_cmd : thisSwitch.off_cmd;
+    const self = this,
+        cmd = state ? thisSwitch.on_cmd : thisSwitch.off_cmd;
     let timer;
 
     // Request to Jeedom server to set state
@@ -229,6 +226,15 @@ jeedomPlatform.prototype.setPowerState = function (thisSwitch, state, callback) 
         if (cmd) this.log(`${thisSwitch.name} is turned ${state ? "on" : "off"}.`);
 
         thisSwitch.state = state;
+
+        // Restore switch after 1s if only one command exists
+        if (!state ? thisSwitch.off_cmd : thisSwitch.on_cmd && !thisSwitch.state_cmd) {
+            setTimeout(() => {
+                this.accessories[thisSwitch.name].getService(Service.Switch)
+                    .setCharacteristic(Characteristic.On, !state);
+                this.log(`${thisSwitch.name} is turned to ${state ? "off" : "on"}, the init state because only one command exists.`);
+            }, 1000);
+        };
 
         if (timer) {
             clearTimeout(timer);
@@ -261,16 +267,14 @@ jeedomPlatform.prototype.configurationRequestHandler = function (context, reques
 
     // Instruction
     if (!context.step) {
-        var instructionResp = {
+        context.step = 1;
+        callback({
             "type": "Interface",
             "interface": "instruction",
             "title": "Before You Start...",
             "detail": "Please make sure homebridge is running with elevated privileges.",
             "showNextButton": true
-        };
-
-        context.step = 1;
-        callback(instructionResp);
+        });
     } else {
         switch (context.step) {
             case 1:
@@ -425,7 +429,7 @@ jeedomPlatform.prototype.configurationRequestHandler = function (context, reques
                 // Clone context if switch exists
                 if (this.accessories[context.name]) {
                     newSwitch = JSON.parse(JSON.stringify(this.accessories[context.name].context));
-                }
+                };
 
                 // Setup input for addAccessory
                 newSwitch.name = context.name;
