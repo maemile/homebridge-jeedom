@@ -1,5 +1,5 @@
 # homebridge-jeedom
-[![npm](https://img.shields.io/npm/v/homebridge-jeedom?style=for-the-badge)![npm](https://img.shields.io/npm/dt/homebridge-jeedom?style=for-the-badge)](https://npmjs.com/homebridge-jeedom)
+[![npm](https://img.shields.io/npm/v/homebridge-jeedom?label=release&style=for-the-badge)![npm](https://img.shields.io/npm/dt/homebridge-jeedom?style=for-the-badge)](https://npmjs.com/homebridge-jeedom)
 
 [Jeedom](https://jeedom.com) plugin for [Homebridge](https://github.com/nfarina/homebridge)
 
