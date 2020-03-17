@@ -21,7 +21,7 @@ This plugin can only run Jeedom commands. In order to test if your `on_cmd`, `of
 
 # Configuration
 ### Basic configuration
- ```
+```json
 "platforms": [{
     "platform": "jeedom",
     "url": "http://192.168.1.6",
@@ -29,7 +29,7 @@ This plugin can only run Jeedom commands. In order to test if your `on_cmd`, `of
 }]
 ```
 ### Advanced configuration
- ```
+```json
 "platforms": [{
     "platform": "jeedom",
     "name": "Jeedom",
