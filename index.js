@@ -25,7 +25,7 @@ function jeedomPlatform(log, config, api) {
         this.api.on("didFinishLaunching", this.didFinishLaunching.bind(this));
     };
 
-    protocolModule = require(this.config.url.split(":")[0]);
+    if (this.config.url) protocolModule = require(this.config.url.split(":")[0]);
 };
 
 // Method to restore accessories from cache
