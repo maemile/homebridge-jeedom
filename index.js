@@ -217,8 +217,7 @@ jeedomPlatform.prototype.getPowerState = function (thisSwitch, callback) {
 
 // Method to set state
 jeedomPlatform.prototype.setPowerState = function (thisSwitch, state, callback) {
-    const self = this,
-        cmd = state ? thisSwitch.on_cmd : thisSwitch.off_cmd;
+    const cmd = state ? thisSwitch.on_cmd : thisSwitch.off_cmd;
     let timer;
 
     // Request to Jeedom server to set state
